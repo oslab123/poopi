@@ -235,6 +235,8 @@ CREATE OR REPLACE PACKAGE BODY c_package AS
    
 END c_package; 
 /
+---------------------------------------------------------------------------
+select * from employee where date<=DATE_SUB(CURDATE(),INTERVAL 21 YEAR);
 
 -----------------------------------------------------------------------------
 sk-l5GQEJHl4m7Z0sMMQ48oT3B
