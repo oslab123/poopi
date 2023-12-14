@@ -1,0 +1,243 @@
+sk-AzBHE20WphHlTepumpHHT3B
+--------------------------
+lbkFJ6ix3HyZ8EoJstKCXIcVJ
+----------------------------
+
+CREATE OR REPLACE FUNCTION totalCustomers 
+RETURN number IS 
+   total number(2) := 0; 
+BEGIN 
+   SELECT count(*) into total 
+   FROM customers; 
+    
+   RETURN total; 
+END; 
+/
+---------------------------------------------
+
+DECLARE 
+   a number; 
+   b number; 
+   c number; 
+FUNCTION findMax(x IN number, y IN number)  
+RETURN number 
+IS 
+    z number; 
+BEGIN 
+   IF x > y THEN 
+      z:= x; 
+   ELSE 
+      Z:= y; 
+   END IF;  
+   RETURN z; 
+END; 
+BEGIN 
+   a:= 23; 
+   b:= 45;  
+   c := findMax(a, b); 
+   dbms_output.put_line(' Maximum of (23,45): ' || c); 
+END; 
+/ 
+
+
+
+----------------------------------------------
+
+
+DECLARE 
+   a number; 
+   b number; 
+   c number;
+PROCEDURE findMin(x IN number, y IN number, z OUT number) IS 
+BEGIN 
+   IF x < y THEN 
+      z:= x; 
+   ELSE 
+      z:= y; 
+   END IF; 
+END;   
+BEGIN 
+   a:= 23; 
+   b:= 45; 
+   findMin(a, b, c); 
+   dbms_output.put_line(' Minimum of (23, 45) : ' || c); 
+END; 
+/
+
+------------------------------------------------------------
+
+create or replace procedure jeff IS 
+ v_district employee.EMP_ADDR%TYPE;
+ cursor dist is select EMP_ADDR from employee where EMP_ID>1;
+ begin
+ open dist;
+ loop
+ fetch dist into v_district;
+ exit when dist%notfound;
+ dbms_output.put_line(v_district);
+ end loop;
+ close dist;
+end;
+/
+
+-------------------------------------
+trigger
+---------
+
+CREATE OR REPLACE TRIGGER display_salary_changes 
+BEFORE DELETE OR INSERT OR UPDATE ON customers 
+FOR EACH ROW 
+WHEN (NEW.ID > 0) 
+DECLARE 
+   sal_diff number; 
+BEGIN 
+   sal_diff := :NEW.salary  - :OLD.salary; 
+   dbms_output.put_line('Old salary: ' || :OLD.salary); 
+   dbms_output.put_line('New salary: ' || :NEW.salary); 
+   dbms_output.put_line('Salary difference: ' || sal_diff); 
+END; 
+/ 
+
+-------------------------------------------------
+
+
+alter table employee add column salary int;
+
+--------------------------------------------------
+
+alter table employee rename coloumn salary to newsalary;
+
+----------------------------------------------------
+
+
+update employee set salary=5000 where id=20;
+
+----------------------------------------------------
+ALTER TABLE table_name
+DROP COLUMN column_name;
+
+---------------------------------------------------
+
+ALTER TABLE table_name
+MODIFY COLUMN column_name datatype;
+
+---------------------------------------------------
+
+DELETE FROM table_name WHERE condition;
+
+
+--------------------------------------------------
+
+DELETE FROM Customers WHERE CustomerName='Alfreds Futterkiste';
+
+-----------------------------------------------------
+view
+----------
+create view gouc as
+select r.name,s.id
+from room_table r join school_table s
+on r.rollno=s.rollno
+
+------------------------------------------------------
+jewel ettan
+-----------
+ SELECT Age, COUNT(Roll_No) AS No_of_Students 
+FROM Student GROUP BY Age
+HAVING COUNT(Roll_No) > 1
+------------------------------------------------------
+PACKAGE
+-------------------------------------------------------
+
+CREATE PACKAGE cust_sal AS 
+   PROCEDURE find_sal(c_id customers.id%type); 
+END cust_sal; 
+/
+
+--------------------------------------------------------
+
+
+CREATE OR REPLACE PACKAGE BODY cust_sal AS  
+   
+   PROCEDURE find_sal(c_id customers.id%TYPE) IS 
+   c_sal customers.salary%TYPE; 
+   BEGIN 
+      SELECT salary INTO c_sal 
+      FROM customers 
+      WHERE id = c_id; 
+      dbms_output.put_line('Salary: '|| c_sal); 
+   END find_sal; 
+END cust_sal; 
+/
+
+
+
+using package
+-------------
+DECLARE 
+   code customers.id%type := &cc_id; 
+BEGIN 
+   cust_sal.find_sal(code); 
+END; 
+/
+-----------------------------------------------------
+
+
+CREATE OR REPLACE PACKAGE c_package AS 
+   -- Adds a customer 
+   PROCEDURE addCustomer(c_id   customers.id%type, 
+   c_name customers.Name%type, 
+   c_age  customers.age%type, 
+   c_addr customers.address%type,  
+   c_sal  customers.salary%type); 
+   
+   -- Removes a customer 
+   PROCEDURE delCustomer(c_id  customers.id%TYPE); 
+   --Lists all customers 
+   PROCEDURE listCustomer; 
+  
+END c_package; 
+/
+
+------------------------------------------------
+
+CREATE OR REPLACE PACKAGE BODY c_package AS 
+   PROCEDURE addCustomer(c_id  customers.id%type, 
+      c_name customers.Name%type, 
+      c_age  customers.age%type, 
+      c_addr  customers.address%type,  
+      c_sal   customers.salary%type) 
+   IS 
+   BEGIN 
+      INSERT INTO customers (id,name,age,address,salary) 
+         VALUES(c_id, c_name, c_age, c_addr, c_sal); 
+   END addCustomer; 
+   
+   PROCEDURE delCustomer(c_id   customers.id%type) IS 
+   BEGIN 
+      DELETE FROM customers 
+      WHERE id = c_id; 
+   END delCustomer;  
+   
+   PROCEDURE listCustomer IS 
+   CURSOR c_customers is 
+      SELECT  name FROM customers; 
+   TYPE c_list is TABLE OF customers.Name%type; 
+   name_list c_list := c_list(); 
+   counter integer :=0; 
+   BEGIN 
+      FOR n IN c_customers LOOP 
+      counter := counter +1; 
+      name_list.extend; 
+      name_list(counter) := n.name; 
+      dbms_output.put_line('Customer(' ||counter|| ')'||name_list(counter)); 
+      END LOOP; 
+   END listCustomer;
+   
+END c_package; 
+/
+
+-----------------------------------------------------------------------------
+sk-l5GQEJHl4m7Z0sMMQ48oT3B
+------------------------------------------------------------------------------
+lbkFJC8GOZj5u5pPAlrmbKoLB
+------------------------------------------------------------------------------
