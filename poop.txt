@@ -237,6 +237,25 @@ END c_package;
 /
 ---------------------------------------------------------------------------
 select * from employee where date<=DATE_SUB(CURDATE(),INTERVAL 21 YEAR);
+---------------------------------------------------------------------------
+
+SELECT s.sname
+FROM sailor s
+JOIN reserve r ON s.sid = r.sid
+WHERE s.sid IN (
+    SELECT sid
+    FROM reserve
+    GROUP BY day,sid
+    HAVING COUNT(day) = 1
+);
+
+-----------------------------------------------------------------------------
+
+FOREIGN KEY(SID) REFERENCES SAILORS(SID);
+-----------------------------------------------------------------------------
+
+
+
 
 -----------------------------------------------------------------------------
 sk-l5GQEJHl4m7Z0sMMQ48oT3B
